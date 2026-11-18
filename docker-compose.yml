@@ -8,7 +8,11 @@ services:
     
     container_name: carrot-backend
     restart: always
-    #  포트
+
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL    #  포트
     expose:
       - "8080"
     # .env 파일
