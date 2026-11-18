@@ -16,7 +16,7 @@ COPY . .
 RUN npm run build
 
 # 2. 실행 단계 (Nginx)
-FROM nginx:stable-alpine
+FROM nginx:1.30.7-alpine
 COPY --from=build /app/build /usr/share/nginx/html
 
 # 프로젝트에 있는 파일명인 'nginx.conf'를 복사하도록 변경(API 환경변수 이미지규정등 등러가있음 )

@@ -32,7 +32,7 @@ jobs:
           
           # 프론트엔드 빌드 (✅ 도메인 주소로 빌드 인자 수정)
           docker build \
-            --build-arg REACT_APP_API_URL=http://yellow.it.kr:8080 \
+            --build-arg REACT_APP_API_URL="" \
             --build-arg REACT_APP_GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
             -t ${{ steps.login-ecr.outputs.registry }}/carrot-frontend ./frontend
           docker push ${{ steps.login-ecr.outputs.registry }}/carrot-frontend

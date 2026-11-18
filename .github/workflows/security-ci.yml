@@ -1,0 +1,56 @@
+name: Validate Restok containers
+
+on:
+  pull_request:
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - "docker-compose.yml"
+      - ".github/workflows/security-ci.yml"
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - "docker-compose.yml"
+      - ".github/workflows/security-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  compose-and-images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate Compose configuration
+        env:
+          AWS_ACCOUNT_ID: "000000000000"
+          RDS_HOSTNAME: "127.0.0.1"
+          RDS_USERNAME: ci
+          RDS_PASSWORD: ci-password
+          GOOGLE_CLIENT_ID: ci-client
+          GOOGLE_CLIENT_SECRET: ci-secret
+          GEMINI_API_KEY: ci-gemini-key
+          AWS_ACCESS_KEY: ci-access-key
+          AWS_SECRET_KEY: ci-secret-key
+          AWS_S3_BUCKET: ci-bucket
+          APP_CORS_ALLOWED_ORIGINS: "http://localhost"
+        run: |
+          touch .env
+          docker compose config --quiet
+
+      - name: Ensure browser API stays same-origin and backend is private
+        run: |
+          grep -Fq 'proxy_pass http://carrot-backend:8080;' frontend/nginx.conf
+          if grep -Eq '"8080:8080"' docker-compose.yml; then
+            echo 'Backend port 8080 must not be published to the host.' >&2
+            exit 1
+          fi
+
+      - name: Build backend image
+        run: docker build --tag restok-backend:ci ./backend
+
+      - name: Build frontend image with patched nginx
+        run: docker build --tag restok-frontend:ci ./frontend

@@ -8,9 +8,14 @@ services:
     
     container_name: carrot-backend
     restart: always
+
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
     #  포트
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
     # .env 파일
     env_file:
       - .env
@@ -33,7 +38,7 @@ services:
 
     #  도커에서 이미지 받아올수있게 하는 경로
     volumes:
-       "/home/ubuntu/changopj/restokimg:/home/ubuntu/changopj/restokimg"
+      - "/home/ubuntu/changopj/restokimg:/home/ubuntu/changopj/restokimg"
 
   # 2. 프론트엔드 (React + Nginx)
   carrot-frontend:
