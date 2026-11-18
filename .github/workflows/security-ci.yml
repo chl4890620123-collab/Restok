@@ -41,6 +41,14 @@ jobs:
           touch .env
           docker compose config --quiet
 
+      - name: Ensure browser API stays same-origin and backend is private
+        run: |
+          grep -Fq 'proxy_pass http://carrot-backend:8080;' frontend/nginx.conf
+          if grep -Eq '"8080:8080"' docker-compose.yml; then
+            echo 'Backend port 8080 must not be published to the host.' >&2
+            exit 1
+          fi
+
       - name: Build backend image
         run: docker build --tag restok-backend:ci ./backend
 
